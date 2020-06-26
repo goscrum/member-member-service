@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports: 
+      - "8090:8090"
+    environment: 
+      - DB_HOST=postgres
+      - DB_DRIVER=postgres
+      - DB_USER=goscrum
+      - DB_PASSWORD=123456789
+      - DB_NAME=member
+      - DB_PORT=5432
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=goscrum
+      - POSTGRES_PASSWORD=123456789
+    ports:
+      - "5432:5432"
