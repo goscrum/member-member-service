@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 # Start a new stage from scratch
-FROM golang:alpine
+FROM golang:alpine as runtime
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
@@ -27,7 +27,7 @@ COPY --from=builder /app/main .
 COPY --from=builder /app/.env .       
 
 # Expose port 8080 to the outside world
-EXPOSE 8080
+EXPOSE $APP_PORT
 
 #Command to run the executable
-CMD ["./main"]
+ENTRYPOINT ["./main"]

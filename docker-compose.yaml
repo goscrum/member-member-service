@@ -5,16 +5,34 @@ services:
     ports: 
       - "8090:8090"
     environment: 
-      - DB_HOST=postgres
-      - DB_DRIVER=postgres
-      - DB_USER=goscrum
-      - DB_PASSWORD=123456789
-      - DB_NAME=member
-      - DB_PORT=5432
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_USER=goscrum
-      - POSTGRES_PASSWORD=123456789
+      - APP_HOST=8090
+  mongo:
+    image: mongo
+    restart: always
     ports:
-      - "5432:5432"
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=user
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpass
+    networks:
+      template:
+        aliases:
+          - mongo
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
+    networks:
+      template:
+        aliases:
+          - mongo-express
+networks:
+  template: {}
