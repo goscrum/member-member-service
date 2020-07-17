@@ -1,23 +1,29 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/goscrum/member-member-service/members"
-	"github.com/joho/godotenv"
+	"net/http"
+	"time"
 )
 
-var database = members.Database{}
-
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error getting env, not comming through %v", err)
-	} else {
-		fmt.Println("We are getting the env values")
-	}
-	database.Initialize(os.Getenv("DB_DRIVER"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_PORT"), os.Getenv("DB_HOST"), os.Getenv("DB_NAME"))
+	r := chi.NewRouter()
 
+	r.Use(middleware.Logger)
+	r.Use(middleware.Timeout(60 * time.Second))
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		if _, err := w.Write([]byte("hello")); err != nil {
+			panic(err)
+		}
+	})
+
+	r.Mount("/members", members.Resource{}.Routes())
+
+	err := http.ListenAndServe(":3333", r)
+	if err != nil {
+		panic([]byte("Some shit happened"))
+	}
 }
