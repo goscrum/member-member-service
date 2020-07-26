@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/goscrum/member-member-service/members"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -22,7 +24,13 @@ func main() {
 
 	r.Mount("/members", members.Resource{}.Routes())
 
-	err := http.ListenAndServe(":3333", r)
+	serverPort := os.Getenv("APP_PORT")
+	var err error
+	if len(serverPort) > 0 {
+		err = http.ListenAndServe(fmt.Sprintf(":%s", serverPort), r)
+	} else {
+		err = http.ListenAndServe(":8080", r)
+	}
 	if err != nil {
 		panic([]byte("Some shit happened"))
 	}

@@ -1,9 +1,11 @@
 package members
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Member struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	Surname    string `json:"surname"`
-	Email      string `json:"email"`
-	ProfilePic string `json:"profile_pic"`
+	ID         primitive.ObjectID `json:"_id, omitempty" bson:"_id, omitempty"`
+	Name       string             `json:"name" bson:"name"`
+	Surname    string             `json:"surname" bson:"surnname"`
+	Email      string             `json:"email" bson:"email"`
+	ProfilePic string             `json:"profile_pic" bson:"profile_pic"`
 }

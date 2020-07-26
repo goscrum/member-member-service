@@ -6,6 +6,11 @@ services:
       - "8090:8090"
     environment: 
       - APP_HOST=8090
+      - APP_DB_HOST=mongo
+      - APP_DB_PORT=27017
+      - APP_DB_USERNAME=root
+      - APP_DB_PASSWORD=rootpass
+      - APP_DB_NAME=go_scrum
   mongo:
     image: mongo
     restart: always
