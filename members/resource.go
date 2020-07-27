@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"net/http"
 )
@@ -41,6 +42,7 @@ func (rs Resource) Create(w http.ResponseWriter, r *http.Request) {
 		getError(err, http.StatusInternalServerError, w, r)
 		return
 	}
+	newMember.ID = primitive.NewObjectID()
 	dao := New()
 	err = dao.Add(&newMember, context.TODO())
 	if err != nil {
