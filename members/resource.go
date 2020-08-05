@@ -1,7 +1,6 @@
 package members
 
 import (
-	"context"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -37,14 +36,15 @@ func getError(err error, status int, w http.ResponseWriter, r *http.Request) {
 
 func (rs Resource) Create(w http.ResponseWriter, r *http.Request) {
 	var newMember Member
+	ctx := r.Context()
 	err := render.DecodeJSON(r.Body, &newMember)
 	if err != nil {
 		getError(err, http.StatusInternalServerError, w, r)
 		return
 	}
 	newMember.ID = primitive.NewObjectID()
-	dao := New()
-	err = dao.Add(&newMember, context.TODO())
+	dao := New(ctx)
+	err = dao.Add(&newMember, ctx)
 	if err != nil {
 		getError(err, http.StatusBadRequest, w, r)
 		return
