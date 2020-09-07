@@ -20,6 +20,9 @@ func (rs Resource) Routes() chi.Router {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Post("/", rs.Create)
+	r.Route("/{memberID}", func(sr chi.Router) {
+		sr.Get("/", rs.GetByID)
+	})
 
 	return r
 }
@@ -51,4 +54,22 @@ func (rs Resource) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, newMember)
+}
+
+func (rs Resource) GetByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	memberID := chi.URLParam(r, "memberID")
+	oid, err := primitive.ObjectIDFromHex(memberID)
+	if err != nil {
+		getError(err, http.StatusNotFound, w, r)
+	}
+
+	dao := New(ctx)
+	member, err := dao.GetByID(oid, ctx)
+	if err != nil {
+		getError(err, http.StatusNotFound, w, r)
+		return
+	}
+
+	render.JSON(w, r, member)
 }

@@ -3,6 +3,7 @@ package members
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -12,7 +13,7 @@ import (
 )
 
 type DAO struct {
-	collection *mongo.Collection
+	Collection *mongo.Collection
 }
 
 func New(ctx context.Context) *DAO {
@@ -23,7 +24,7 @@ func New(ctx context.Context) *DAO {
 	db := os.Getenv("APP_DB_NAME")
 
 	newDAO := DAO{
-		collection: connectDB(ctx, host, port, username, password, db, "members"),
+		Collection: connectDB(ctx, host, port, username, password, db, "members"),
 	}
 
 	return &newDAO
@@ -50,11 +51,24 @@ func (dao *DAO) Add(member *Member, ctx context.Context) error {
 	internalContext, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	result, err := dao.collection.InsertOne(internalContext, member)
+	result, err := dao.Collection.InsertOne(internalContext, member)
 	if err != nil {
 		return err
 	}
 
 	member.ID = result.InsertedID.(primitive.ObjectID)
 	return nil
+}
+
+func (dao *DAO) GetByID(id primitive.ObjectID, ctx context.Context) (*Member, error) {
+	internalContext, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	result := Member{}
+	err := dao.Collection.FindOne(internalContext, bson.M{"_id": id}).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
